@@ -169,39 +169,44 @@
     letter-spacing: 1px;
   }
 
-  .answer-row {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
+  .options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
     margin-bottom: 8px;
   }
 
-  .answer-row input[type="number"] {
-    width: 110px;
-    text-align: center;
-    font-size: 1.3rem;
-    font-weight: 700;
-    padding: 12px;
-    border-radius: 10px;
+  .option-btn {
+    padding: 16px;
+    border-radius: 12px;
     border: 1px solid var(--die-border);
     background: var(--die-bg);
     color: var(--ink);
-  }
-
-  .answer-row button {
-    padding: 12px 18px;
-    border: none;
-    border-radius: 10px;
-    background: var(--accent);
-    color: #fff;
     font-weight: 700;
-    font-size: 1rem;
+    font-size: 1.3rem;
     cursor: pointer;
+    transition: transform 0.1s ease, background 0.15s ease, border-color 0.15s ease;
   }
 
-  .answer-row button:hover {
-    background: var(--accent-dark);
+  .option-btn:hover:not(:disabled) {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+  }
+
+  .option-btn:disabled {
+    cursor: default;
+  }
+
+  .option-btn.correct {
+    background: #2f9e44;
+    border-color: #2f9e44;
+    color: #fff;
+  }
+
+  .option-btn.wrong {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
   }
 
   .feedback {
@@ -268,16 +273,13 @@
 
       <div class="question" id="question">? × ?</div>
 
-      <div class="answer-row">
-        <input type="number" id="answerInput" placeholder="?" autocomplete="off">
-        <button type="button" id="checkBtn">Ellenőrzés</button>
-      </div>
+      <div class="options-grid" id="optionsGrid"></div>
 
       <div class="feedback" id="feedback"></div>
       <button type="button" class="next-btn" id="nextBtn">Következő kérdés →</button>
     </div>
 
-    <footer>Írd be a választ, aztán Enter vagy "Ellenőrzés". Helyes válasz után automatikusan jön a következő kérdés.</footer>
+    <footer>Kattints a szerinted helyes eredményre. Helyes válasz után automatikusan jön a következő kérdés.</footer>
   </div>
 
 <script>
@@ -286,8 +288,7 @@
   const selectNoneBtn = document.getElementById('selectNoneBtn');
   const upperBoundSelect = document.getElementById('upperBound');
   const questionEl = document.getElementById('question');
-  const answerInput = document.getElementById('answerInput');
-  const checkBtn = document.getElementById('checkBtn');
+  const optionsGrid = document.getElementById('optionsGrid');
   const feedbackEl = document.getElementById('feedback');
   const nextBtn = document.getElementById('nextBtn');
   const scoreCorrectEl = document.getElementById('scoreCorrect');
