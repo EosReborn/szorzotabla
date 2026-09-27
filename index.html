@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Szorzótábla gyakorlás</title>
+<style>
+  :root {
+    --bg: #f4f1ea;
+    --card: #ffffff;
+    --ink: #1f2430;
+    --muted: #6b7280;
+    --accent: #d64545;
+    --accent-dark: #b23434;
+    --die-bg: #ffffff;
+    --die-border: #1f2430;
+    --shadow: rgba(31, 36, 48, 0.15);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #15171c;
+      --card: #1f2229;
+      --ink: #f1f1f1;
+      --muted: #9aa0ab;
+      --accent: #e6584f;
+      --accent-dark: #c2453d;
+      --die-bg: #2a2d36;
+      --die-border: #e8e8e8;
+      --shadow: rgba(0, 0, 0, 0.5);
+    }
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    padding: 32px 16px;
+  }
+
+  .app {
+    width: 100%;
+    max-width: 640px;
+  }
+
+  h1 {
+    text-align: center;
+    font-size: 1.8rem;
+    margin: 0 0 4px;
+  }
+
+  .subtitle {
+    text-align: center;
+    color: var(--muted);
+    margin: 0 0 28px;
+    font-size: 0.95rem;
+  }
+
+  .card {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 8px 24px var(--shadow);
+    margin-bottom: 20px;
+  }
+
+  .controls-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-bottom: 10px;
+  }
+
+  .table-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .table-grid label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 8px 4px;
+    border-radius: 10px;
+    border: 1px solid var(--die-border);
+    background: var(--die-bg);
+    cursor: pointer;
+    font-size: 0.92rem;
+    font-weight: 600;
+  }
+
+  .table-grid input[type="checkbox"] {
+    accent-color: var(--accent);
+  }
+
+  .quick-actions {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+
+  .quick-actions button {
+    flex: 1;
+    padding: 8px;
+    border-radius: 10px;
+    border: 1px solid var(--die-border);
+    background: var(--die-bg);
+    color: var(--ink);
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
+
+  .quick-actions button:hover {
+    border-color: var(--accent);
+  }
+
+  .range-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .range-row label {
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+
+  .range-row select {
+    padding: 8px 10px;
+    border-radius: 10px;
+    border: 1px solid var(--die-border);
+    background: var(--die-bg);
+    color: var(--ink);
+    font-size: 0.95rem;
+  }
+
+  .question-card {
+    text-align: center;
+  }
+
+  .score-row {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin-bottom: 18px;
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+
+  .score-row strong {
+    color: var(--ink);
+    font-size: 1.05rem;
+  }
+
+  .question {
+    font-size: 2.4rem;
+    font-weight: 800;
+    margin-bottom: 20px;
+    letter-spacing: 1px;
+  }
+
+  .answer-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .answer-row input[type="number"] {
+    width: 110px;
+    text-align: center;
+    font-size: 1.3rem;
+    font-weight: 700;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid var(--die-border);
+    background: var(--die-bg);
+    color: var(--ink);
+  }
+
+  .answer-row button {
+    padding: 12px 18px;
+    border: none;
+    border-radius: 10px;
+    background: var(--accent);
+    color: #fff;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+
+  .answer-row button:hover {
+    background: var(--accent-dark);
+  }
+
+  .feedback {
+    margin-top: 8px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    min-height: 1.4em;
+  }
+
+  .feedback.correct { color: #2f9e44; }
+  .feedback.wrong { color: var(--accent); }
+
+  .next-btn {
+    display: none;
+    margin: 14px auto 0;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 10px;
+    background: var(--ink);
+    color: var(--bg);
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+  }
+
+  .next-btn.active {
+    display: inline-block;
+  }
+
+  footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.8rem;
+  }
+</style>
+</head>
+<body>
+  <div class="app">
+    <h1>✖️ Szorzótábla gyakorlás</h1>
+    <p class="subtitle">Válaszd ki, melyik táblákat gyakoroljátok, aztán válaszolj a kérdésekre!</p>
+
+    <div class="card">
+      <div class="controls-title">Melyik szorzótáblák?</div>
+      <div class="table-grid" id="tableGrid"></div>
+      <div class="quick-actions">
+        <button type="button" id="selectAllBtn">Mind kijelöl</button>
+        <button type="button" id="selectNoneBtn">Kijelölés törlése</button>
+      </div>
+
+      <div class="range-row">
+        <label for="upperBound">Meddig menjen a szorzó?</label>
+        <select id="upperBound">
+          <option value="10">1 – 10</option>
+          <option value="12">1 – 12</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="card question-card">
+      <div class="score-row">
+        <span>Helyes: <strong id="scoreCorrect">0</strong></span>
+        <span>Összes: <strong id="scoreTotal">0</strong></span>
+      </div>
+
+      <div class="question" id="question">? × ?</div>
+
+      <div class="answer-row">
+        <input type="number" id="answerInput" placeholder="?" autocomplete="off">
+        <button type="button" id="checkBtn">Ellenőrzés</button>
+      </div>
+
+      <div class="feedback" id="feedback"></div>
+      <button type="button" class="next-btn" id="nextBtn">Következő kérdés →</button>
+    </div>
+
+    <footer>Írd be a választ, aztán Enter vagy "Ellenőrzés". Helyes válasz után automatikusan jön a következő kérdés.</footer>
+  </div>
+
+<script>
+  const tableGrid = document.getElementById('tableGrid');
+  const selectAllBtn = document.getElementById('selectAllBtn');
+  const selectNoneBtn = document.getElementById('selectNoneBtn');
+  const upperBoundSelect = document.getElementById('upperBound');
+  const questionEl = document.getElementById('question');
+  const answerInput = document.getElementById('answerInput');
+  const checkBtn = document.getElementById('checkBtn');
+  const feedbackEl = document.getElementById('feedback');
+  const nextBtn = document.getElementById('nextBtn');
+  const scoreCorrectEl = document.getElementById('scoreCorrect');
+  const scoreTotalEl = document.getElementById('scoreTotal');
+
+  let currentAnswer = null;
+  let scoreCorrect = 0;
+  let scoreTotal = 0;
+  let answered = false;
+
+  for (let n = 1; n <= 10; n++) {
+    const label = document.createElement('label');
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.value = n;
+    checkbox.checked = true;
+    checkbox.className = 'table-check';
+    label.appendChild(checkbox);
+    label.append(` ${n}`);
+    tableGrid.appendChild(label);
+  }
+
+  const tableChecks = () => Array.from(document.querySelectorAll('.table-check'));
+
+  function getSelectedTables() {
+    return tableChecks().filter(c => c.checked).map(c => parseInt(c.value, 10));
+  }
+
+  function newQuestion() {
+    const tables = getSelectedTables();
+    const upper = parseInt(upperBoundSelect.value, 10);
+
+    if (tables.length === 0) {
+      questionEl.textContent = 'Válassz ki legalább egy táblát!';
+      currentAnswer = null;
+      return;
+    }
+
+    const a = tables[Math.floor(Math.random() * tables.length)];
+    const b = Math.floor(Math.random() * upper) + 1;
+
+    currentAnswer = a * b;
+    questionEl.textContent = `${a} × ${b}`;
+    answerInput.value = '';
+    feedbackEl.textContent = '';
+    feedbackEl.className = 'feedback';
+    nextBtn.classList.remove('active');
+    answered = false;
+    answerInput.focus();
+  }
+
+  function checkAnswer() {
+    if (currentAnswer === null || answered) return;
+    const guess = parseInt(answerInput.value, 10);
+
+    if (Number.isNaN(guess)) {
+      feedbackEl.textContent = 'Írj be egy számot!';
+      feedbackEl.className = 'feedback wrong';
+      return;
+    }
+
+    answered = true;
+    scoreTotal++;
+
+    if (guess === currentAnswer) {
+      scoreCorrect++;
+      feedbackEl.textContent = '✅ Ügyes vagy, ez helyes!';
+      feedbackEl.className = 'feedback correct';
+      scoreCorrectEl.textContent = scoreCorrect;
+      scoreTotalEl.textContent = scoreTotal;
+      setTimeout(newQuestion, 900);
+    } else {
+      feedbackEl.textContent = `❌ Még nem az, a helyes válasz: ${currentAnswer}`;
+      feedbackEl.className = 'feedback wrong';
+      scoreCorrectEl.textContent = scoreCorrect;
+      scoreTotalEl.textContent = scoreTotal;
+      nextBtn.classList.add('active');
+    }
+  }
+
+  checkBtn.addEventListener('click', checkAnswer);
+  nextBtn.addEventListener('click', newQuestion);
+
+  answerInput.addEventListener('keydown', (e) => {
+    if (e.code === 'Enter') {
+      e.preventDefault();
+      if (answered) {
+        newQuestion();
+      } else {
+        checkAnswer();
+      }
+    }
+  });
+
+  selectAllBtn.addEventListener('click', () => {
+    tableChecks().forEach(c => c.checked = true);
+    newQuestion();
+  });
+
+  selectNoneBtn.addEventListener('click', () => {
+    tableChecks().forEach(c => c.checked = false);
+    newQuestion();
+  });
+
+  tableGrid.addEventListener('change', newQuestion);
+  upperBoundSelect.addEventListener('change', newQuestion);
+
+  newQuestion();
+</script>
+</body>
+</html>
