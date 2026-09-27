@@ -317,9 +317,39 @@
     return tableChecks().filter(c => c.checked).map(c => parseInt(c.value, 10));
   }
 
+  function shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  function buildOptions(correct) {
+    const options = new Set([correct]);
+    let guardCount = 0;
+
+    while (options.size < 4 && guardCount < 100) {
+      guardCount++;
+      const offset = Math.floor(Math.random() * 10) - 5; // -5..4
+      const candidate = correct + (offset === 0 ? 6 : offset) * (Math.random() < 0.5 ? 1 : 2);
+      if (candidate > 0 && candidate !== correct) {
+        options.add(candidate);
+      }
+    }
+
+    return shuffle(Array.from(options));
+  }
+
   function newQuestion() {
     const tables = getSelectedTables();
     const upper = parseInt(upperBoundSelect.value, 10);
+
+    optionsGrid.innerHTML = '';
+    feedbackEl.textContent = '';
+    feedbackEl.className = 'feedback';
+    nextBtn.classList.remove('active');
+    answered = false;
 
     if (tables.length === 0) {
       questionEl.textContent = 'Válassz ki legalább egy táblát!';
@@ -332,56 +362,49 @@
 
     currentAnswer = a * b;
     questionEl.textContent = `${a} × ${b}`;
-    answerInput.value = '';
-    feedbackEl.textContent = '';
-    feedbackEl.className = 'feedback';
-    nextBtn.classList.remove('active');
-    answered = false;
-    answerInput.focus();
+
+    const options = buildOptions(currentAnswer);
+    options.forEach(value => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'option-btn';
+      btn.textContent = value;
+      btn.addEventListener('click', () => selectAnswer(btn, value));
+      optionsGrid.appendChild(btn);
+    });
   }
 
-  function checkAnswer() {
+  function selectAnswer(btn, value) {
     if (currentAnswer === null || answered) return;
-    const guess = parseInt(answerInput.value, 10);
-
-    if (Number.isNaN(guess)) {
-      feedbackEl.textContent = 'Írj be egy számot!';
-      feedbackEl.className = 'feedback wrong';
-      return;
-    }
-
     answered = true;
     scoreTotal++;
 
-    if (guess === currentAnswer) {
+    const allButtons = optionsGrid.querySelectorAll('.option-btn');
+    allButtons.forEach(b => b.disabled = true);
+
+    if (value === currentAnswer) {
       scoreCorrect++;
+      btn.classList.add('correct');
       feedbackEl.textContent = '✅ Ügyes vagy, ez helyes!';
       feedbackEl.className = 'feedback correct';
-      scoreCorrectEl.textContent = scoreCorrect;
-      scoreTotalEl.textContent = scoreTotal;
       setTimeout(newQuestion, 900);
     } else {
+      btn.classList.add('wrong');
+      allButtons.forEach(b => {
+        if (parseInt(b.textContent, 10) === currentAnswer) {
+          b.classList.add('correct');
+        }
+      });
       feedbackEl.textContent = `❌ Még nem az, a helyes válasz: ${currentAnswer}`;
       feedbackEl.className = 'feedback wrong';
-      scoreCorrectEl.textContent = scoreCorrect;
-      scoreTotalEl.textContent = scoreTotal;
       nextBtn.classList.add('active');
     }
+
+    scoreCorrectEl.textContent = scoreCorrect;
+    scoreTotalEl.textContent = scoreTotal;
   }
 
-  checkBtn.addEventListener('click', checkAnswer);
   nextBtn.addEventListener('click', newQuestion);
-
-  answerInput.addEventListener('keydown', (e) => {
-    if (e.code === 'Enter') {
-      e.preventDefault();
-      if (answered) {
-        newQuestion();
-      } else {
-        checkAnswer();
-      }
-    }
-  });
 
   selectAllBtn.addEventListener('click', () => {
     tableChecks().forEach(c => c.checked = true);
